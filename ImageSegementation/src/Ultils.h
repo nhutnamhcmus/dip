@@ -1,11 +1,18 @@
 #pragma once
 #ifndef UTILS_H
 #define UTILS_H
-
+#include <functional>
+#include <string>
+#include <iostream>
 #include "cv_include.h"
 
 class Utils {
 public:
+
+	static void log(std::string msg) {
+		[output = std::ref(std::cout << msg)] (){output.get() << "\n"; }();
+	}
+
 	static int __str_cmp__(const char* string_1, const char* string_2)
 	{
 		while (*string_1)
