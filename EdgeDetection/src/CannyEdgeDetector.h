@@ -21,6 +21,14 @@ public:
 	*/
 	int Apply(const cv::Mat& srcImage, cv::Mat& dstImage);
 
+	int getLowThreshold();
+	int getHighThreshold();
+
+
+	void setLowThreshold(int lowThreshold);
+	void setHighThreshold(int highThreshold);
+
+	std::pair<int, int> getThreshold();
 	CannyEdgeDetector();
 	~CannyEdgeDetector();
 };
