@@ -26,3 +26,13 @@ public:
 };
 
 #endif  // CANNY_EDGE_DETECTOR_H
+
+
+/*
+Canny Edge Detection
+1. Smooth with gaussian filter.
+2. Compute h/v gradients.
+3. Compute magnitude of gradient.
+4. Perform Non-Maximal Suppression.
+5. Perform Hysteresis Threshold.
+*/
