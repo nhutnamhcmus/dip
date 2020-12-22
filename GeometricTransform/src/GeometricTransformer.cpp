@@ -97,7 +97,7 @@ void AffineTransform::Scale(float sx, float sy) { // xây dựng matrix transfor
 
 void AffineTransform::TransformPoint(float& x, float& y) { // transform 1 điểm (x,y) theo matrix transform đã có
 	float oldPointMatrix[] = { x, y, 1 };
-	cv::Mat newPoint = this->_matrixTransform * cv::Mat(3, 3, CV_32FC1, oldPointMatrix);
+	cv::Mat newPoint = this->_matrixTransform * cv::Mat(1, 3, CV_32FC1, oldPointMatrix);
 	x = newPoint.ptr<float>(0)[0];
 	y = newPoint.ptr<float>(0)[1];
 }
