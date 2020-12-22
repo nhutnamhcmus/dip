@@ -142,10 +142,12 @@
     <ClCompile Include="Convolution1D.cpp" />
     <ClCompile Include="Convolution2D.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Convolution1D.h" />
     <ClInclude Include="Convolution2D.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
