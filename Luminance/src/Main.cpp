@@ -3,6 +3,9 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
 
+
+// Luminace = 0.3086 * Red + 0.6094 * Green + 0.0820 * Blue
+// Luminace = 0.299 * Red + 0.587 * Green + 0.114 * Blue
 int luminance(cv::Mat& sourceImage, cv::Mat& destinationImage) {
 	// Kiểm tra ảnh đầu vào
 	if (sourceImage.data == NULL) {
@@ -33,7 +36,19 @@ int luminance(cv::Mat& sourceImage, cv::Mat& destinationImage) {
 		uchar* pDstRow = pDstData;
 
 		for (int x = 0; x < width; x++, pSrcRow += srcChannels, pDstRow += dstChannels) {
-			pDstRow[0] = (unsigned char)(0.299 * pSrcRow[2] + 0.587 * pSrcRow[1] + 0.114 * pSrcRow[0] + 0.5);
+			uchar blue = pSrcRow[0];
+			uchar green = pSrcRow[1];
+			uchar red = pSrcRow[2];
+			int value = 0;
+			value += blue;
+			value += ((green << 2) + green);
+			value += (red << 1);
+
+			value >>= 3;
+
+			// pDstRow[0] = (unsigned char)(0.299 * pSrcRow[2] + 0.587 * pSrcRow[1] + 0.114 * pSrcRow[0] + 0.5);
+
+			pDstRow[0] = (uchar)value;
 		}
 	}
 
