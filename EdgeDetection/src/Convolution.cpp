@@ -596,15 +596,14 @@ int Convolution::Convole(const cv::Mat& sourceImage, cv::Mat& destinationImage)
 
     if (mode == 3) {
         std::cout << "Enable mode for color image...\n";
-        std::vector<int> offsets;
         std::cout << "Calculating kernel center...\n";
-        for (int y = -kernelCenterY; y <= kernelCenterY; y++)
-        {
-            for (int x = -kernelCenterX; x <= kernelCenterX; x++)
-            {
-                offsets.push_back(y * sourceWidthStep + x);
+        std::vector <int> dx;
+        std::vector <int> dy;
+        for (int i = 0; i < this->_kernelHeight; i++)
+            for (int j = 0; j < this->_kernelWidth; j++) {
+                dx.push_back(i - (this->_kernelHeight / 2));
+                dy.push_back(j - (this->_kernelWidth / 2));
             }
-        }
 
         std::cout << "Convolution...\n";
         float blue = 0;
@@ -619,38 +618,28 @@ int Convolution::Convole(const cv::Mat& sourceImage, cv::Mat& destinationImage)
         this->separateColorImg(sourceImage, greenLayer, 1);
         this->separateColorImg(sourceImage, redLayer, 2);
 
-        // Khởi tạo các ma trận Destination convolution cho các Layer: Blue, Green, Red
-        cv::Mat blueLayerConvole = blueLayer.clone();
-        cv::Mat greenLayerConvole = greenLayer.clone();
-        cv::Mat redLayerConvole = redLayer.clone();
-
-        uchar* blueData = blueLayer.data;
-        uchar* greenData = greenLayer.data;
-        uchar* redData = redLayer.data;
-
-
-        for (int i = 0; i < sourceHeight; i++, ptrDestinationData += destinationWidthStep, blueData += blueLayer.step[0], greenData += greenLayer.step[0], redData += redLayer.step[0]) {
-            uchar* ptrBlueRow = blueData;
-            uchar* ptrGreenRow = greenData;
-            uchar* ptrRedRow = redData;
-            uchar* ptrDestinationRow = ptrDestinationData;
-            for (int j = 0; j < sourceWidth; j++, ptrDestinationRow += destinationChannels, ptrBlueRow += blueLayer.channels(), ptrGreenRow +=  greenLayer.channels(), ptrRedRow += redLayer.channels()) {
-                blue = 0;
-                green = 0;
-                red = 0;
-
-                for (int k = 0; k < offsets.size(); k++) {
-                    blue += ptrBlueRow[offsets[k]] * this->_kernel[offsets.size() - 1 - k];
-                    green += ptrGreenRow[offsets[k]] * this->_kernel[offsets.size() - 1 - k];
-                    red += ptrRedRow[offsets[k]] * this->_kernel[offsets.size() - 1 - k];
+       
+        for (int i = 0; i < destinationImage.rows; i++) {
+            float* dataRow = destinationImage.ptr<float>(i);
+            for (int j = 0; j < destinationImage.cols; j++, dataRow += destinationChannels) {
+                int i_source = i + (this->_kernelHeight / 2), j_source = j + (this->_kernelWidth / 2);
+                float convolutionBlue = 0.0;
+                float convolutionGreen = 0.0;
+                float convolutionRed = 0.0;
+                for (int k = 0; k < this->_kernelHeight * this->_kernelWidth; k++) {
+                    float dataBlue = 1.0 * blueLayer.ptr<uchar>(i_source - dx[k])[j_source - dy[k]];
+                    float dataRed = 1.0 * redLayer.ptr<uchar>(i_source - dx[k])[j_source - dy[k]];
+                    float dataGreen = 1.0 * greenLayer.ptr<uchar>(i_source - dx[k])[j_source - dy[k]];
+                    float dataKernel = 1.0 * this->_kernel[(dx[k] + (this->_kernelHeight / 2)) * this->_kernelHeight + dy[k] + (this->_kernelWidth / 2)];
+                    convolutionBlue += dataBlue * dataKernel;
+                    convolutionGreen += dataGreen * dataKernel;
+                    convolutionRed += dataRed * dataKernel;
                 }
-
-                ptrDestinationRow[0] = (uchar)blue;
-                ptrDestinationRow[1] = (uchar)(green);
-                ptrDestinationRow[2] = (uchar)(red);
+                dataRow[0] = convolutionBlue;
+                dataRow[1] = convolutionGreen;
+                dataRow[2] = convolutionRed;
             }
         }
-
         blueLayer.release();
         greenLayer.release();
         redLayer.release();

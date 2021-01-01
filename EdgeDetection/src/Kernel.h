@@ -12,7 +12,13 @@ class Kernel {
 public:
 	void displayKernel(const std::vector<float>& v);
 	std::vector<float> getGaussianKernel(int rows, int cols, double sigmax, double sigmay);
+	std::vector<float> getSobelKernelX();
+	std::vector<float> getSobelKernelY();
 
+	std::vector<float> getPrewittKernelX();
+	std::vector<float> getPrewittKernelY();
+
+	std::vector<float> getLaplaceKernel();
 	Kernel();
 	~Kernel();
 };

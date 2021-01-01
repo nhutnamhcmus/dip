@@ -10,7 +10,7 @@ int main() {
 
 	Convolution convolution;
 	Kernel kernel;
-	convolution.SetKernel(kernel.getGaussianKernel(5,5,1,2), 5,5);
+	convolution.SetKernel(kernel.getGaussianKernel(5, 5, 1, 2), 5, 5);
 	// kernel.displayKernel(convolution.GetKernel());
 	std::cout << convolution.GetKernel().size();
 	cv::Mat inputImage = cv::imread("E:/lena.jpg", cv::IMREAD_ANYCOLOR);

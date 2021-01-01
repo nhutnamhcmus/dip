@@ -1,6 +1,7 @@
 ﻿#include "CannyEdgeDetector.h"
 #include "Converter.h"
 #include "GaussianBlur.h"
+#include "Kernel.h"
 
 /*
 	Hàm áp dụng thuật toán Canny để phát hiện biên cạnh
@@ -57,19 +58,53 @@ int CannyEdgeDetector::Apply(const cv::Mat& srcImage, cv::Mat& dstImage)
 	// Widthstep của ảnh destination
 	size_t destinationWidthStep = dstImage.step[0];
 
+	uchar* ptrSrcData = srcImageClone.data;
+	uchar* ptrDesData = dstImage.data;
 
+	Kernel kernel;
 	// 1) Smooth with Gaussian Filter
 	GaussianBlur gaussianBlur;
 	cv::Mat bluredImg;
 	gaussianBlur.Blur(srcImageClone, bluredImg, 17, 17);
 
 	// 2) Compute Horizontal/Vertical Gradient
+	short* deltaX, * deltaY;             // store horizontal and vertical gradient
+	deltaX = new short[sourceWidth * sourceHeigth];
+	deltaY = new short[sourceWidth * sourceHeigth];
+	// compute delta X
+	// deltaX = f(x+1) - f(x-1)
+	for (int y = 0; y < sourceHeigth; y++) {
+		int t = y * sourceWidth;
+		deltaX[t] = ptrSrcData[t + 1] - ptrSrcData[t];
+		for (int x = 1; x < sourceWidth; x++) {
+			t++;
+			deltaX[t] = ptrSrcData[t + 1] - ptrSrcData[t - 1];
+		}
 
+		t++;
+		deltaX[t] = ptrSrcData[t] - ptrSrcData[t - 1];
+	}
 
+	// compute delta Y
+	// deltaY = f(y+1) - f(y-1)
+	for (int y = 0; y < sourceHeigth; y++) {
+		int t = y;
+		deltaX[t] = ptrSrcData[t + sourceWidth] - ptrSrcData[t];
+		for (int x = 1; x < sourceWidth; x++) {
+			t += x;
+			deltaY[t] = ptrSrcData[t + sourceWidth] - ptrSrcData[t - sourceWidth];
+		}
 
+		t += sourceWidth;
+		deltaY[t] = ptrSrcData[t] - ptrSrcData[t - sourceWidth];
+	}
 	// 3) Compute Magnitude of gradient
-
-
+	unsigned short* mag;                // store magnitude of gradient
+	mag = new unsigned short[sourceWidth * sourceHeigth];
+	int tmp = 0;
+	for (int i = 0; i < sourceHeigth; ++i)
+		for (int j = 0; j < sourceWidth; ++j, ++tmp)
+			mag[tmp] = (unsigned short)(abs(deltaX[tmp]) + abs(deltaY[tmp]));
 	// 4) Non-Maximal Suppression (NMS)
 
 
